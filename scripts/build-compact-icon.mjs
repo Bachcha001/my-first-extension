@@ -1,10 +1,11 @@
-// Build a compact palette PNG icon (128x128) with very few colours so the
-// committed file stays tiny and byte-stable. Run: node scripts/build-compact-icon.mjs
+// Build compact palette PNG icons (16/32/48/128) with very few colours so the
+// committed files stay tiny, byte-stable and at their declared pixel size.
+// Run: node scripts/build-compact-icon.mjs
 import { deflateSync } from 'node:zlib'
 import { writeFileSync } from 'node:fs'
 
-const W = 128
-const H = 128
+const SIZES = [16, 32, 48, 128]
+const BASE = 128
 
 const palette = [
   [0xfb, 0xf6, 0xef],
@@ -13,11 +14,11 @@ const palette = [
   [0x2a, 0x2a, 0x2a],
 ]
 
-const px = new Uint8Array(W * H)
+const design = new Uint8Array(BASE * BASE)
 
 const set = (x, y, c) => {
-  if (x < 0 || y < 0 || x >= W || y >= H) return
-  px[y * W + x] = c
+  if (x < 0 || y < 0 || x >= BASE || y >= BASE) return
+  design[y * BASE + x] = c
 }
 
 const ellipse = (cx, cy, rx, ry, c) => {
@@ -55,21 +56,15 @@ set(69, 28, 3)
 set(70, 28, 3)
 ellipse(64, 36, 7, 4, 2)
 
-const raw = Buffer.alloc(H * (1 + W))
-for (let y = 0; y < H; y++) {
-  raw[y * (1 + W)] = 0
-  for (let x = 0; x < W; x++) raw[y * (1 + W) + 1 + x] = px[y * W + x]
-}
-
-const table = new Int32Array(256)
+const crcTable = new Int32Array(256)
 for (let n = 0; n < 256; n++) {
   let c = n
   for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
-  table[n] = c
+  crcTable[n] = c
 }
 const crc32 = (buf) => {
   let c = 0xffffffff
-  for (const b of buf) c = table[(c ^ b) & 0xff] ^ (c >>> 8)
+  for (const b of buf) c = crcTable[(c ^ b) & 0xff] ^ (c >>> 8)
   return (c ^ 0xffffffff) >>> 0
 }
 
@@ -82,25 +77,38 @@ const chunk = (type, data) => {
   return Buffer.concat([len, body, crc])
 }
 
-const ihdr = Buffer.alloc(13)
-ihdr.writeUInt32BE(W, 0)
-ihdr.writeUInt32BE(H, 4)
-ihdr[8] = 8
-ihdr[9] = 3
-ihdr[10] = 0
-ihdr[11] = 0
-ihdr[12] = 0
+const renderPng = (size) => {
+  const raw = Buffer.alloc(size * (1 + size))
+  for (let y = 0; y < size; y++) {
+    const sy = Math.min(BASE - 1, Math.floor((y * BASE) / size))
+    raw[y * (1 + size)] = 0
+    for (let x = 0; x < size; x++) {
+      const sx = Math.min(BASE - 1, Math.floor((x * BASE) / size))
+      raw[y * (1 + size) + 1 + x] = design[sy * BASE + sx]
+    }
+  }
 
-const png = Buffer.concat([
-  Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-  chunk('IHDR', ihdr),
-  chunk('PLTE', Buffer.from(palette.flat())),
-  chunk('IDAT', deflateSync(raw, { level: 9 })),
-  chunk('IEND', Buffer.alloc(0)),
-])
+  const ihdr = Buffer.alloc(13)
+  ihdr.writeUInt32BE(size, 0)
+  ihdr.writeUInt32BE(size, 4)
+  ihdr[8] = 8
+  ihdr[9] = 3
+  ihdr[10] = 0
+  ihdr[11] = 0
+  ihdr[12] = 0
 
-for (const name of ['icon-16.png', 'icon-32.png', 'icon-48.png', 'icon-128.png']) {
-  writeFileSync(`entrypoints/icons/${name}`, png)
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk('IHDR', ihdr),
+    chunk('PLTE', Buffer.from(palette.flat())),
+    chunk('IDAT', deflateSync(raw, { level: 9 })),
+    chunk('IEND', Buffer.alloc(0)),
+  ])
 }
-console.log('wrote', png.length, 'bytes to each icon')
-console.log(png.toString('base64'))
+
+for (const size of SIZES) {
+  const png = renderPng(size)
+  writeFileSync(`entrypoints/icons/icon-${size}.png`, png)
+  console.log(`icon-${size}.png ${png.length} bytes`)
+  console.log(png.toString('base64'))
+}
