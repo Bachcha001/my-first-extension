@@ -25,6 +25,17 @@ type Snapshot = {
   note: string
 }
 
+// Page titles, URLs and notes are untrusted input: escape them before they are
+// interpolated into the popup markup.
+const ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+}
+const esc = (value: string) => value.replace(/[&<>"']/g, (c) => ESCAPES[c]!)
+
 function moodChip(
   mood: GiraffeMood,
   active: boolean,
@@ -78,7 +89,7 @@ function render(root: HTMLElement, state: {
         <div class="giraffe-tag">
           <span class="giraffe-tag-label">mood</span>
           <span class="giraffe-tag-value" id="moodLabel">
-            ${state.mood}
+            ${esc(state.mood)}
           </span>
         </div>
       </div>
@@ -139,7 +150,7 @@ function render(root: HTMLElement, state: {
 
     ${
       state.message
-        ? `<div class="message">${state.message}</div>`
+        ? `<div class="message">${esc(state.message)}</div>`
         : ''
     }
 
@@ -152,7 +163,7 @@ function render(root: HTMLElement, state: {
           type="text"
           placeholder="optional, stored only on this device"
           maxlength="300"
-          value="${state.note}"
+          value="${esc(state.note)}"
         />
       </div>
 
@@ -174,12 +185,12 @@ function render(root: HTMLElement, state: {
                       <button
                         class="snapshot-link"
                         type="button"
-                        data-url="${s.url}"
+                        data-url="${esc(s.url)}"
                       >
                         <span class="snapshot-title">
-                          ${s.title || 'Reading snapshot'}
+                          ${esc(s.title || 'Reading snapshot')}
                         </span>
-                        <span class="snapshot-meta">${label}</span>
+                        <span class="snapshot-meta">${esc(label)}</span>
                       </button>
                       <button
                         class="snapshot-delete"
@@ -197,7 +208,7 @@ function render(root: HTMLElement, state: {
 
     ${
       state.openUrl
-        ? `<a class="open-link" href="${state.openUrl}" target="_blank" rel="noopener">open this page</a>`
+        ? `<a class="open-link" href="${esc(state.openUrl)}" target="_blank" rel="noopener">open this page</a>`
         : ''
     }
 
