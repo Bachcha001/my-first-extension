@@ -1,0 +1,362 @@
+:root {
+  --bg: #fbf6ef;
+  --panel: #ffffff;
+  --line: #e9ddc9;
+  --ink: #2a2a2a;
+  --muted: #6b5a47;
+  --soft: #f3ead8;
+  --accent: #e8c49a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  padding: 14px;
+  min-width: 300px;
+  max-width: 340px;
+}
+
+.popup-header {
+  margin-bottom: 12px;
+}
+
+.popup-title {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popup-title-emoji {
+  font-size: 20px;
+}
+
+.popup-sub {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.giraffe-stage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 12px;
+}
+
+.giraffe-canvas {
+  display: block;
+  width: 240px;
+  height: 160px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #fffaf2, #f6ead2);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--line);
+  touch-action: manipulation;
+}
+
+.giraffe-canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.giraffe-tag {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.giraffe-tag-label {
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.giraffe-tag-value {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.control-label {
+  color: var(--muted);
+  font-size: 12px;
+  min-width: 96px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 12px;
+  width: 100%;
+}
+
+.action-button {
+  flex: 1;
+  background: var(--accent);
+  color: #3a2a1a;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 100ms ease, box-shadow 100ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+.action-button:active {
+  transform: translateY(0);
+}
+
+.action-button:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.action-button.secondary {
+  background: var(--soft);
+  color: var(--ink);
+  flex: 1;
+}
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.mood-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ink);
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.mood-chip:hover {
+  border-color: var(--chip-color);
+}
+
+.mood-chip.active {
+  background: color-mix(in srgb, var(--chip-color) 16%, white);
+  border-color: var(--chip-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--chip-color) 22%, transparent);
+}
+
+.mood-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--chip-color);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.mood-label {
+  text-transform: capitalize;
+}
+
+.preset-row {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+
+.preset-chip {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+  text-transform: capitalize;
+}
+
+.preset-chip:hover {
+  border-color: var(--accent);
+}
+
+.preset-chip.active {
+  background: var(--soft);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+.note-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 13px;
+  min-width: 0;
+}
+
+.note-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.snapshot-panel {
+  padding-bottom: 12px;
+}
+
+.snapshot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.snapshot-empty {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 8px 0;
+}
+
+.snapshot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid transparent;
+}
+
+.snapshot-row:hover {
+  background: var(--soft);
+}
+
+.snapshot-link {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  gap: 8px;
+  align-items: center;
+}
+
+.snapshot-title {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.snapshot-meta {
+  color: var(--muted);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.snapshot-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.snapshot-delete:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #b03a2e;
+}
+
+.message {
+  background: var(--soft);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.open-link {
+  display: inline-block;
+  background: var(--soft);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.open-link:hover {
+  text-decoration: underline;
+}
+
+.popup-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  padding: 0 2px;
+}
