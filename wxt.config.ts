@@ -14,5 +14,12 @@ export default defineConfig({
       '48': 'icons/icon-48.png',
       '128': 'icons/icon-128.png',
     },
+    browser_specific_settings: {
+      gecko: {
+        id: 'giraffe-mood-refresh@bachcha001.github.io',
+        strict_min_version: '115.0',
+        data_collection_permissions: { required: ['none'] },
+      },
+    },
   },
 })
